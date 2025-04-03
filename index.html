@@ -121,17 +121,17 @@
                     'fill-color': [
                         'match',
                         ['get', 'grade'],
-                        'A', 'green',
-                        'B', 'blue',
-                        'C', 'yellow',
-                        'D', 'red',
+                        'A', '#31af66',
+                        'B', '#3b4cbf',
+                        'C', '#c6ce55',
+                        'D', '#d14d4d',
                         'grey'
                     ],
                     'fill-opacity': [
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
-                        0.7,
-                        0.4
+                        0.8,
+                        0.7
                     ]
                 },
                 layout: {
@@ -196,7 +196,7 @@
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
                         0.8,
-                        0.4
+                        0.7
                     ]},
                 layout: {visibility: 'visible'}
             });
