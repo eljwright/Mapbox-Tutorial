@@ -131,7 +131,7 @@
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
                         0.8,
-                        0.7
+                        0.5
                     ]
                 },
                 layout: {
@@ -139,13 +139,41 @@
                 }
             });
 
-            // beforeMap.addLayer({
-            //     id: 'redlining_seattle_line',
-            //     type: 'line',
-            //     source: 'redlining_seattle',
-            //     paint: { 'line-color': 'black' },
-            //     layout: { visibility: 'visible' }
-            // });
+            beforeMap.addLayer({
+                id: 'redlining_seattle_line',
+                type: 'line',
+                source: 'redlining_seattle',
+                paint: {
+                    'fill-color': [
+                        'match',
+                        ['get', 'grade'],
+                        'A', '#31af66',
+                        'B', '#3b4cbf',
+                        'C', '#c6ce55',
+                        'D', '#d14d4d',
+                        'grey'
+                    ],
+                    'line-width': 2
+                },
+                layout: { visibility: 'visible' }
+            });
+
+            beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
+                if (e.features.length > 0) {
+                    if (hoveredPolygonId !== null) {
+                        map.seatFeatureState(
+                            { source: 'redlining_seattle', id: hoveredPolygonId },
+                            { hover: false }
+                        );
+                    }
+                    hoveredPolygonId = e.features[0].id;
+                    map.seatFeatureState(
+                        { source: 'redlining_seattle', id: hoveredPolygonId },
+                        { hover: true}
+                    );
+                }
+            });
+
         });
 
         // Modern Equity Index Map
