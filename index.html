@@ -113,7 +113,7 @@
                 layout: {visibility: 'visible'}
             });
         
-        let hoveredPolygonId = null;
+            let hoveredPolygonId = null;
 
             beforeMap.addLayer({
                 id: 'redlining_seattle_fill',
@@ -123,69 +123,73 @@
                     'fill-color': [
                         'match',
                         ['get', 'grade'],
-                        'A', '#31af66',
-                        'B', '#3b4cbf',
-                        'C', '#c6ce55',
-                        'D', '#d14d4d',
-                        'grey'
+                            'A', '#31af66',
+                            'B', '#3b4cbf',
+                            'C', '#c6ce55',
+                            'D', '#d14d4d',
+                            'grey'
                     ],
                     'fill-opacity': [
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
-                        0.9,
-                        0.7
+                            0.9,
+                            0.7
                     ]
-                },
+            },
                 layout: {
                     visibility: 'visible'
                 }
             });
 
-            beforeMap.addLayer({
-                id: 'redlining_seattle_line',
-                type: 'line',
-                source: 'redlining_seattle',
-                paint: {
-                    'line-color': [
-                        'match',
-                        ['get', 'grade'],
-                        'A', '#31af66',
-                        'B', '#3b4cbf',
-                        'C', '#c6ce55',
-                        'D', '#d14d4d',
-                        'grey'
-                    ],
-                    'line-width': 1
-                },
-                layout: { visibility: 'visible' }
-            });
+beforeMap.addLayer({
+    id: 'redlining_seattle_line',
+    type: 'line',
+    source: 'redlining_seattle',
+    paint: {
+        'line-color': [
+            'match',
+            ['get', 'grade'],
+            'A', '#31af66',
+            'B', '#3b4cbf',
+            'C', '#c6ce55',
+            'D', '#d14d4d',
+            'grey'
+        ],
+        'line-width': 1
+    },
+    layout: { visibility: 'visible' }
+});
 
-            beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
-                if (e.features.length > 0) {
-                    if (hoveredPolygonId !== null) {
-                        beforeMap.setFeatureState(
-                            { source: 'redlining_seattle', id: hoveredPolygonId },
-                            { hover: false }
-                        );
-                    }
-                    hoveredPolygonId = e.features[0].id;
-                    beforeMap.setFeatureState(
-                        { source: 'redlining_seattle', id: hoveredPolygonId },
-                        { hover: true}
-                    );
-                }
-            });
+beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
+    if (e.features.length > 0) {
+        const feature = e.features[0];
+        const featureId = feature.properties && feature.properties.area_id;
 
-            beforeMap.on('mouseleave', 'redlining_seattle_fill', () => {
-                if (hoveredPolygonId !== null) {
-                    beforeMap.setFeatureState(
-                        { source: 'redlining_seattle', id: hoveredPolygonId },
-                        { hover: false }
-                    );
-                }
-                hoveredPolygonId = null;
-            });
-        });
+        if (featureId) { // Only proceed if we have a valid ID
+            if (hoveredPolygonId !== null && hoveredPolygonId !== featureId) {
+                beforeMap.setFeatureState(
+                    { source: 'redlining_seattle', id: hoveredPolygonId },
+                    { hover: false }
+                );
+            }
+            hoveredPolygonId = featureId;
+            beforeMap.setFeatureState(
+                { source: 'redlining_seattle', id: hoveredPolygonId },
+                { hover: true }
+            );
+        }
+    }
+});
+
+beforeMap.on('mouseleave', 'redlining_seattle_fill', () => {
+    if (hoveredPolygonId !== null) {
+        beforeMap.setFeatureState(
+            { source: 'redlining_seattle', id: hoveredPolygonId },
+            { hover: false }
+        );
+    }
+    hoveredPolygonId = null;
+});
         // Modern Equity Index Map
         const afterMap = new mapboxgl.Map({
             container: 'after',
