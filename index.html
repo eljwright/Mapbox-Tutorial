@@ -35,12 +35,9 @@
         }
 
         #sidebar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            padding: 30px;
             width: 150px;
-            height: auto;
+            flex-shrink: 0;
+            height: 100%;
         }
 
         button {
@@ -191,7 +188,8 @@
                 });
 
                 if (selectedZone) {
-                    alert(selectedZone.properties.grade)
+                    const { label, grade } = selectedZone.properties
+                    alert(`The grade of ${label} is ${grade}`)
                 }
             })
         });
