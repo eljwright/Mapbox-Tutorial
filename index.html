@@ -176,8 +176,16 @@
                 }
             });
 
+            beforeMap('mouseleave', 'redlining_seattle_fill', () => {
+                if (hoveredPolygonId !== null) {
+                    beforeMap.setFeatureState(
+                        { source: 'redlining_seattle', id: hoveredPolygonId },
+                        { hover: false }
+                    );
+                }
+                hoveredPolygonId = null;
+            });
         });
-
         // Modern Equity Index Map
         const afterMap = new mapboxgl.Map({
             container: 'after',
