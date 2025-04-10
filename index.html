@@ -157,7 +157,7 @@
                 },
                 layout: { visibility: 'visible' }
             });
-            
+
             beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
                 if (e.features.length > 0) {
                     const featureId = e.features[0].properties.area_id;
@@ -184,6 +184,10 @@
                 }
                 hoveredPolygonId = null;
             });
+
+            beforeMap.on('click', (e) => {
+                console.log('click', e.point)
+            })
         });
         // Modern Equity Index Map
         const afterMap = new mapboxgl.Map({
