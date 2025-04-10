@@ -84,7 +84,7 @@
 
         mapboxgl.accessToken = 'pk.eyJ1IjoiZWxqd3JpZ2h0IiwiYSI6ImNtNDduZnlweTA3dm4ybXNjY3R5anAyOGsifQ.gS6yn_JP5mcEIyF9wbgspw';
         let hoveredPolygonId = null;
-        
+
         // Historic HOLC Map
         const beforeMap = new mapboxgl.Map({
             container: 'before',
@@ -154,7 +154,7 @@
                         'D', '#d14d4d',
                         'grey'
                     ],
-                    'line-width': 2
+                    'line-width': 1
                 },
                 layout: { visibility: 'visible' }
             });
@@ -162,13 +162,13 @@
             beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
                 if (e.features.length > 0) {
                     if (hoveredPolygonId !== null) {
-                        map.seatFeatureState(
+                        beforeMap.seatFeatureState(
                             { source: 'redlining_seattle', id: hoveredPolygonId },
                             { hover: false }
                         );
                     }
                     hoveredPolygonId = e.features[0].id;
-                    map.seatFeatureState(
+                    beforeMap.seatFeatureState(
                         { source: 'redlining_seattle', id: hoveredPolygonId },
                         { hover: true}
                     );
