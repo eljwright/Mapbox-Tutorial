@@ -83,7 +83,6 @@
         ];
 
         mapboxgl.accessToken = 'pk.eyJ1IjoiZWxqd3JpZ2h0IiwiYSI6ImNtNDduZnlweTA3dm4ybXNjY3R5anAyOGsifQ.gS6yn_JP5mcEIyF9wbgspw';
-        let hoveredPolygonId = null;
 
         // Historic HOLC Map
         const beforeMap = new mapboxgl.Map({
@@ -94,6 +93,8 @@
             projection: 'globe',
             maxBounds: bounds
         });
+
+        let hoveredPolygonId = null;
 
         beforeMap.on('load', () => {
             beforeMap.addSource('redlining_seattle', {
