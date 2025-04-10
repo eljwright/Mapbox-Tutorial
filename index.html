@@ -94,8 +94,6 @@
             maxBounds: bounds
         });
 
-        let hoveredPolygonId = null;
-
         beforeMap.on('load', () => {
             beforeMap.addSource('redlining_seattle', {
                 type: 'geojson',
@@ -114,6 +112,8 @@
                 paint: {'line-color': 'black'},
                 layout: {visibility: 'visible'}
             });
+        
+        let hoveredPolygonId = null;
 
             beforeMap.addLayer({
                 id: 'redlining_seattle_fill',
