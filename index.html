@@ -163,7 +163,7 @@
             beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
                 if (e.features.length > 0) {
                     if (hoveredPolygonId !== null) {
-                        beforeMap.seatFeatureState(
+                        beforeMap.setFeatureState(
                             { source: 'redlining_seattle', id: hoveredPolygonId },
                             { hover: false }
                         );
@@ -176,7 +176,7 @@
                 }
             });
 
-            beforeMap('mouseleave', 'redlining_seattle_fill', () => {
+            beforeMap.on('mouseleave', 'redlining_seattle_fill', () => {
                 if (hoveredPolygonId !== null) {
                     beforeMap.setFeatureState(
                         { source: 'redlining_seattle', id: hoveredPolygonId },
