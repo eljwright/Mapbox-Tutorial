@@ -1,4 +1,4 @@
-{
+[{
     "area_id": 1700,
     "city_id": 170,
     "label": "A1",
@@ -717,4 +717,5 @@
     "description": "This area is located on a steep inaccessible sidehill.",
     "selected_fields": "This area is located on a steep inaccessible sidehill.",
     "all_fields": "This area is located on a steep inaccessible sidehill."
-},
+}
+]
