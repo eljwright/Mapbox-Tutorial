@@ -122,7 +122,7 @@
     <script>
 
         const initial_center = [-122.341919, 47.598645];
-        const initial_zoom = 10;
+        const initial_zoom = 10.75;
         const bounds = [
             [-123.371258, 47.009962], //SW Coords
             [-121.616192, 48.046616] // NE Coords
@@ -160,25 +160,14 @@
 
             //Adding layers to beforeMap
 
-            //RSE Index so the popups can display data from the layer
-            //At 0 opacity so it doesnt actually show the layer on map
-            beforeMap.addLayer({
-                id: 'RSE_Index',
-                type: 'fill',
-                source: 'RSE_Index',
-                paint: {
-                    'fill-color': '#000000',
-                    'fill-opacity': 0 
-                }
-            });
-
             //Neighborhood boundaries (prob take out later)
             beforeMap.addLayer({
                 id: 'seattle_neighborhoods_Lhood',
                 type: 'line',
                 source: 'seattle_neighborhoods_Lhood',
                 paint: {'line-color': 'black'},
-                layout: {visibility: 'visible'}
+                //neighborhood boundaries set to none for now
+                layout: {visibility: 'none'}
             });
 
             //Redlining layer with colors based on grades
@@ -225,6 +214,18 @@
                 },
                 layout: { visibility: 'visible' }
             });
+            
+            //RSE Index so the popups can display data from the layer
+            //At 0 opacity so it doesnt actually show the layer on map
+            beforeMap.addLayer({
+                id: 'RSE_Index',
+                type: 'fill',
+                source: 'RSE_Index',
+                paint: {
+                    'fill-color': '#000000',
+                    'fill-opacity': 0 
+                }
+            });
 
         });
 
@@ -265,9 +266,7 @@
             beforeMap.getCanvas().style.cursor = '';
         });
 
-        // When a click event occurs on a feature in the redlining layer,
-        // open a popup at the location of the click, with description
-        // HTML from the click event's properties.
+        //POPUPS FOR REDLINING MAP
         beforeMap.on('click', (e) => {
             const [ selectedZone ] = beforeMap.queryRenderedFeatures(e.point, {
                 layers: ['redlining_seattle_fill']
@@ -283,15 +282,15 @@
 
                 const compositeQuintile = selectedRSE ? selectedRSE.properties.COMPOSITE_QUINTILE : 'Unknown';
 
-                //HTML POPUP CONTENT LAYOUT
-                const popupContent = `<h1>${label}</h1><br>
+                //HTML REDLINING POPUP CONTENT LAYOUT
+                const popupContent_Redlining = `<h1>${label}</h1><br>
                 <b>Area Description:</b> This area is graded as something because of whatever their racist reasons were.<br><br>
                 <b>Modern RSE Inequality Classification:</b> ${compositeQuintile}
                 `;
 
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
-                    .setHTML(popupContent)
+                    .setHTML(popupContent_Redlining)
                     .addTo(beforeMap);
             }
         });
@@ -307,6 +306,7 @@
             maxBounds: bounds
         });
 
+        //Adding after map sources
         afterMap.on('load', () => {
             afterMap.addSource('RSE_Index', {
                 type: 'geojson',
@@ -317,15 +317,25 @@
                 type: 'geojson',
                 data: 'data/seattle_neighborhoods_Lhood.geojson'
             });
+            //Redlining Map to use for popups
+            afterMap.addSource('redlining_seattle', {
+                type: 'geojson',
+                data: 'data/redlining_seattle.geojson',
+            });
 
+            //ADDING AFTER MAP LAYERS
+
+            //Neighborhood boundaries (prob take out later)
             afterMap.addLayer({
                 id: 'seattle_neighborhoods_Lhood',
                 type: 'line',
                 source: 'seattle_neighborhoods_Lhood',
                 paint: {'line-color': 'black'},
-                layout: {visibility: 'visible'}
+                //neighborhood boundaries set to none for now
+                layout: {visibility: 'none'}
             });
 
+            //RSE Index (colors based on grades)
             afterMap.addLayer({
                 id: 'RSE_Index',
                 type: 'fill',
@@ -350,7 +360,6 @@
                     ]},
             });
 
-
             afterMap.addLayer({
                 id: 'RSE_Index',
                 type: 'line',
@@ -359,9 +368,20 @@
                 layout: {visibility: 'visible'}
             });
 
+            //Redlining layer for popups
+            afterMap.addLayer({
+                id: 'redlining_seattle_fill',
+                type: 'fill',
+                source: 'redlining_seattle',
+                paint: {
+                    'fill-color': '#000000',
+                    'fill-opacity': 0 
+                }
+            });
+
         });
 
-
+        //Mouse hover for After Map
         afterMap.on('mousemove', 'RSE_Index', (e) => {
             if (e.features.length > 0) {
                 if (hoveredPolygonId !== null) {
@@ -387,6 +407,7 @@
             hoveredPolygonId = null;
         });
 
+        //Changes mouse to pointer on hover
         afterMap.on('mouseenter', 'RSE_Index', () => {
             afterMap.getCanvas().style.cursor = 'pointer';
         });
@@ -395,13 +416,42 @@
             afterMap.getCanvas().style.cursor = '';
         });
 
+        //POPUPS FOR RSE MAP
+        afterMap.on('click', (e) => {
+            const [ selectedTract ] = afterMap.queryRenderedFeatures(e.point, {
+                layers: ['RSE_Index']
+            });
+
+            if (selectedTract) {
+                const { TRACT, COMPOSITE_QUINTILE, RACE_ELL_ORIGINS_QUINTILE, SOCIOECON_DISADV_QUINTILE, HEALTH_DISADV_QUINTILE} = selectedTract.properties;
+
+                //Redlining Layer
+                const [ selectedRedlining ] = afterMap.queryRenderedFeatures(e.point, {
+                    layers: ['redlining_seattle_fill']
+                });
+
+                const redliningGrade = selectedRedlining ? selectedRedlining.properties.grade : 'Unknown';
+
+                //HTML REDLINING POPUP CONTENT LAYOUT
+                const popupContent_RSE = `<h1>Census Tract ${TRACT}</h1><br>
+                <b>Modern RSE Inequality Classification:</b> ${COMPOSITE_QUINTILE}<br><br>
+                <b>Historic Redlining Grade:</b> ${redliningGrade}
+                `;
+
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(popupContent_RSE)
+                    .addTo(afterMap);
+            }
+        });
+
     
-        // Comp Full Map
+        // Comp Full Map - COMPARE FUNCTION
         const map = new mapboxgl.Compare(beforeMap, afterMap, '#comparison-container', {
             mousemove: false // Enable for mousemove comparison, but it can be a bit much
         });
 
-    
+    //Geolocater - try to fix so its on the comp map and not have to be on both before and after maps
     beforeMap.addControl(
         new mapboxgl.GeolocateControl({
             positionOptions: {
@@ -413,7 +463,6 @@
             showUserHeading: true
         })
     );
-
     afterMap.addControl(
         new mapboxgl.GeolocateControl({
             positionOptions: {
@@ -427,7 +476,7 @@
     );
 
 
-        // --- Toggle Neighborhood Boundaries ---
+        // Toggle Neighborhood Boundaries 
         document.querySelector('#toggle-neighborhood-boundaries').addEventListener('click', () => {
             const isVisible = beforeMap.getLayoutProperty('seattle_neighborhoods_Lhood', 'visibility') === 'visible';
 
@@ -441,6 +490,7 @@
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         });
 
+        //Fly to West Seattle
         document.querySelector('#fly-to-west-seattle').addEventListener('click', () => {
             beforeMap.flyTo({
                 center: [-122.38920, 47.57426],
