@@ -140,6 +140,7 @@
             maxBounds: bounds
         });
 
+        //Adding sources to beforeMap
         beforeMap.on('load', () => {
             beforeMap.addSource('redlining_seattle', {
                 type: 'geojson',
@@ -157,6 +158,10 @@
                 data: 'data/RSE_Index.geojson'
             });
 
+            //Adding layers to beforeMap
+
+            //RSE Index so the popups can display data from the layer
+            //At 0 opacity so it doesnt actually show the layer on map
             beforeMap.addLayer({
                 id: 'RSE_Index',
                 type: 'fill',
@@ -167,6 +172,7 @@
                 }
             });
 
+            //Neighborhood boundaries (prob take out later)
             beforeMap.addLayer({
                 id: 'seattle_neighborhoods_Lhood',
                 type: 'line',
@@ -175,6 +181,7 @@
                 layout: {visibility: 'visible'}
             });
 
+            //Redlining layer with colors based on grades
             beforeMap.addLayer({
                 id: 'redlining_seattle_fill',
                 type: 'fill',
@@ -199,6 +206,7 @@
                 },
             });
 
+            //Add redlining line layer
             beforeMap.addLayer({
                 id: 'redlining_seattle_line',
                 type: 'line',
@@ -220,6 +228,7 @@
 
         });
 
+        //Hover mouse section for before map
         let hoveredPolygonId = null
 
         beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
@@ -247,6 +256,7 @@
             hoveredPolygonId = null;
         });
 
+        //Cursor changes on hover
         beforeMap.on('mouseenter', 'redlining_seattle_fill', () => {
             beforeMap.getCanvas().style.cursor = 'pointer';
         });
@@ -270,8 +280,6 @@
                 const [ selectedRSE ] = beforeMap.queryRenderedFeatures(e.point, {
                     layers: ['RSE_Index']
                 });
-
-                console.log(selectedRSE);
 
                 const compositeQuintile = selectedRSE ? selectedRSE.properties.COMPOSITE_QUINTILE : 'Unknown';
 
