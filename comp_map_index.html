@@ -143,7 +143,8 @@
         beforeMap.on('load', () => {
             beforeMap.addSource('redlining_seattle', {
                 type: 'geojson',
-                data: 'data/redlining_seattle.geojson'
+                data: 'data/redlining_seattle.geojson',
+                promoteId: 'area_id'
             });
 
             beforeMap.addSource('seattle_neighborhoods_Lhood', {
@@ -158,9 +159,12 @@
 
             beforeMap.addLayer({
                 id: 'RSE_Index',
-                type: 'line',
+                type: 'fill',
                 source: 'RSE_Index',
-                layout: {visibility: 'none'}
+                paint: {
+                    'fill-color': '#000000',
+                    'fill-opacity': 0 
+                }
             });
 
             beforeMap.addLayer({
@@ -175,6 +179,7 @@
                 id: 'redlining_seattle_fill',
                 type: 'fill',
                 source: 'redlining_seattle',
+                layout: {},
                 paint: {
                     'fill-color': [
                         'match',
@@ -189,12 +194,9 @@
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
                         0.9,
-                        0.7
+                        0.65
                     ]
                 },
-                layout: {
-                    visibility: 'visible'
-                }
             });
 
             beforeMap.addLayer({
@@ -216,44 +218,77 @@
                 layout: { visibility: 'visible' }
             });
 
-            beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
-                if (e.features.length > 0) {
-                    const featureId = e.features[0].properties.area_id;
-                    if (hoveredPolygonId !== null) {
-                        beforeMap.setFeatureState(
-                            { source: 'redlining_seattle', id: hoveredPolygonId },
-                            { hover: false }
-                        );
-                    }
-                    hoveredPolygonId = featureId;
-                    beforeMap.setFeatureState(
-                        { source: 'redlining_seattle', id: hoveredPolygonId },
-                        { hover: true}
-                    );
-                }
-            });
+        });
 
-            beforeMap.on('mouseleave', 'redlining_seattle_fill', () => {
+        let hoveredPolygonId = null
+
+        beforeMap.on('mousemove', 'redlining_seattle_fill', (e) => {
+            if (e.features.length > 0) {
                 if (hoveredPolygonId !== null) {
                     beforeMap.setFeatureState(
                         { source: 'redlining_seattle', id: hoveredPolygonId },
                         { hover: false }
                     );
                 }
-                hoveredPolygonId = null;
+                hoveredPolygonId = e.features[0].id;
+                beforeMap.setFeatureState(
+                    { source: 'redlining_seattle', id: hoveredPolygonId },
+                    { hover: true }
+                );
+            }
+        });
+        beforeMap.on('mouseleave', 'redlining_seattle_fill', () => {
+            if (hoveredPolygonId !== null) {
+                beforeMap.setFeatureState(
+                    { source: 'redlining_seattle', id: hoveredPolygonId },
+                    { hover: false }
+                );
+            }
+            hoveredPolygonId = null;
+        });
+
+        beforeMap.on('mouseenter', 'redlining_seattle_fill', () => {
+            beforeMap.getCanvas().style.cursor = 'pointer';
+        });
+
+        beforeMap.on('mouseleave', 'redlining_seattle_fill', () => {
+            beforeMap.getCanvas().style.cursor = '';
+        });
+
+        // When a click event occurs on a feature in the redlining layer,
+        // open a popup at the location of the click, with description
+        // HTML from the click event's properties.
+        beforeMap.on('click', (e) => {
+            const [ selectedZone ] = beforeMap.queryRenderedFeatures(e.point, {
+                layers: ['redlining_seattle_fill']
             });
 
-            beforeMap.on('click', (e) => {
-                const [ selectedZone ] = beforeMap.queryRenderedFeatures(e.point, {
-                    layers: ['redlining_seattle_fill']
+            if (selectedZone) {
+                const { label, grade, area_id} = selectedZone.properties;
+
+                //RSE Layer
+                const [ selectedRSE ] = beforeMap.queryRenderedFeatures(e.point, {
+                    layers: ['RSE_Index']
                 });
 
-                if (selectedZone) {
-                    const { label, grade } = selectedZone.properties
-                    alert(`The grade of ${label} is ${grade}`)
-                }
-            })
+                console.log(selectedRSE);
+
+                const compositeQuintile = selectedRSE ? selectedRSE.properties.COMPOSITE_QUINTILE : 'Unknown';
+
+                //HTML POPUP CONTENT LAYOUT
+                const popupContent = `<h1>${label}</h1><br>
+                <b>Area Description:</b> This area is graded as something because of whatever their racist reasons were.<br><br>
+                <b>Modern RSE Inequality Classification:</b> ${compositeQuintile}
+                `;
+
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(popupContent)
+                    .addTo(beforeMap);
+            }
         });
+
+
         // Modern Equity Index Map
         const afterMap = new mapboxgl.Map({
             container: 'after',
@@ -287,6 +322,7 @@
                 id: 'RSE_Index',
                 type: 'fill',
                 source: 'RSE_Index',
+                layout: {},
                 paint: {
                     'fill-color': [
                         'match',
@@ -301,11 +337,11 @@
                     'fill-opacity': [
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
-                        0.8,
-                        0.7
+                        0.9,
+                        0.65
                     ]},
-                layout: {visibility: 'visible'}
             });
+
 
             afterMap.addLayer({
                 id: 'RSE_Index',
@@ -316,11 +352,72 @@
             });
 
         });
+
+
+        afterMap.on('mousemove', 'RSE_Index', (e) => {
+            if (e.features.length > 0) {
+                if (hoveredPolygonId !== null) {
+                    afterMap.setFeatureState(
+                        { source: 'RSE_Index', id: hoveredPolygonId },
+                        { hover: false }
+                    );
+                }
+                hoveredPolygonId = e.features[0].id;
+                afterMap.setFeatureState(
+                    { source: 'RSE_Index', id: hoveredPolygonId },
+                    { hover: true }
+                );
+            }
+        });
+        afterMap.on('mouseleave', 'RSE_Index', () => {
+            if (hoveredPolygonId !== null) {
+                afterMap.setFeatureState(
+                    { source: 'RSE_Index', id: hoveredPolygonId },
+                    { hover: false }
+                );
+            }
+            hoveredPolygonId = null;
+        });
+
+        afterMap.on('mouseenter', 'RSE_Index', () => {
+            afterMap.getCanvas().style.cursor = 'pointer';
+        });
+
+        afterMap.on('mouseleave', 'RSE_Index', () => {
+            afterMap.getCanvas().style.cursor = '';
+        });
+
     
         // Comp Full Map
         const map = new mapboxgl.Compare(beforeMap, afterMap, '#comparison-container', {
             mousemove: false // Enable for mousemove comparison, but it can be a bit much
         });
+
+    
+    beforeMap.addControl(
+        new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            // When active the map will receive updates to the device's location as it changes.
+            trackUserLocation: true,
+            // Draw an arrow next to the location dot to indicate which direction the device is heading.
+            showUserHeading: true
+        })
+    );
+
+    afterMap.addControl(
+        new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            // When active the map will receive updates to the device's location as it changes.
+            trackUserLocation: true,
+            // Draw an arrow next to the location dot to indicate which direction the device is heading.
+            showUserHeading: true
+        })
+    );
+
 
         // --- Toggle Neighborhood Boundaries ---
         document.querySelector('#toggle-neighborhood-boundaries').addEventListener('click', () => {
