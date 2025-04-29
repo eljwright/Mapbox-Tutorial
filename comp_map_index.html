@@ -283,9 +283,9 @@
                 const compositeQuintile = selectedRSE ? selectedRSE.properties.COMPOSITE_QUINTILE : 'Unknown';
 
                 //HTML REDLINING POPUP CONTENT LAYOUT
-                const popupContent_Redlining = `<h1>${label}</h1><br>
+                const popupContent_Redlining = `<h1 style="color:#878e91;">Zone ${label}</h1>
                 <b>Area Description:</b> This area is graded as something because of whatever their racist reasons were.<br><br>
-                <b>Modern RSE Inequality Classification:</b> ${compositeQuintile}
+                <b>Modern RSE Inequality Score:</b> ${compositeQuintile}
                 `;
 
                 new mapboxgl.Popup()
@@ -432,10 +432,14 @@
 
                 const redliningGrade = selectedRedlining ? selectedRedlining.properties.grade : 'Unknown';
 
-                //HTML REDLINING POPUP CONTENT LAYOUT
-                const popupContent_RSE = `<h1>Census Tract ${TRACT}</h1><br>
-                <b>Modern RSE Inequality Classification:</b> ${COMPOSITE_QUINTILE}<br><br>
-                <b>Historic Redlining Grade:</b> ${redliningGrade}
+                //HTML RSE POPUP CONTENT LAYOUT
+                const popupContent_RSE = `<h1 style="color:#878e91;">Census Tract ${TRACT}</h1>
+                <h2><a href="https://experience.arcgis.com/experience/494bdbb2da4f4574bb330f072bc77073" target="_blank">Modern RSE Data:</a></h2>
+                <h3>Composite Inequality Score: ${COMPOSITE_QUINTILE}</h3>
+                <b>Socioeconomic Disadvantage:</b> ${SOCIOECON_DISADV_QUINTILE}<br>
+                <b>Health Disadvantage:</b> ${HEALTH_DISADV_QUINTILE}<br>
+                <b>Race, ELL, Origins:</b> ${RACE_ELL_ORIGINS_QUINTILE}<br><br>
+                <h2>Historic Redlining Grade: ${redliningGrade}</h2>
                 `;
 
                 new mapboxgl.Popup()
