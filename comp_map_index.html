@@ -142,9 +142,9 @@
 
         //Adding sources to beforeMap
         beforeMap.on('load', () => {
-            beforeMap.addSource('redlining_seattle', {
+            beforeMap.addSource('merged_seattle_redlining', {
                 type: 'geojson',
-                data: 'data/redlining_seattle.geojson',
+                data: 'data/merged_seattle_redlining.geojson',
                 promoteId: 'area_id'
             });
 
@@ -174,7 +174,7 @@
             beforeMap.addLayer({
                 id: 'redlining_seattle_fill',
                 type: 'fill',
-                source: 'redlining_seattle',
+                source: 'merged_seattle_redlining',
                 layout: {},
                 paint: {
                     'fill-color': [
@@ -199,7 +199,7 @@
             beforeMap.addLayer({
                 id: 'redlining_seattle_line',
                 type: 'line',
-                source: 'redlining_seattle',
+                source: 'merged_seattle_redlining',
                 paint: {
                     'line-color': [
                         'match',
@@ -236,13 +236,13 @@
             if (e.features.length > 0) {
                 if (hoveredPolygonId !== null) {
                     beforeMap.setFeatureState(
-                        { source: 'redlining_seattle', id: hoveredPolygonId },
+                        { source: 'merged_seattle_redlining', id: hoveredPolygonId },
                         { hover: false }
                     );
                 }
                 hoveredPolygonId = e.features[0].id;
                 beforeMap.setFeatureState(
-                    { source: 'redlining_seattle', id: hoveredPolygonId },
+                    { source: 'merged_seattle_redlining', id: hoveredPolygonId },
                     { hover: true }
                 );
             }
@@ -250,7 +250,7 @@
         beforeMap.on('mouseleave', 'redlining_seattle_fill', () => {
             if (hoveredPolygonId !== null) {
                 beforeMap.setFeatureState(
-                    { source: 'redlining_seattle', id: hoveredPolygonId },
+                    { source: 'merged_seattle_redlining', id: hoveredPolygonId },
                     { hover: false }
                 );
             }
@@ -273,7 +273,7 @@
             });
 
             if (selectedZone) {
-                const { label, grade, area_id} = selectedZone.properties;
+                const { label, grade, description} = selectedZone.properties;
 
                 //RSE Layer
                 const [ selectedRSE ] = beforeMap.queryRenderedFeatures(e.point, {
@@ -284,7 +284,7 @@
 
                 //HTML REDLINING POPUP CONTENT LAYOUT
                 const popupContent_Redlining = `<h1 style="color:#878e91;">Zone ${label}</h1>
-                <b>Area Description:</b> This area is graded as something because of whatever their racist reasons were.<br><br>
+                <b>Area Description:</b> ${description}<br><br>
                 <b>Modern RSE Inequality Score:</b> ${compositeQuintile}
                 `;
 
@@ -318,9 +318,9 @@
                 data: 'data/seattle_neighborhoods_Lhood.geojson'
             });
             //Redlining Map to use for popups
-            afterMap.addSource('redlining_seattle', {
+            afterMap.addSource('merged_seattle_redlining', {
                 type: 'geojson',
-                data: 'data/redlining_seattle.geojson',
+                data: 'data/merged_seattle_redlining.geojson',
             });
 
             //ADDING AFTER MAP LAYERS
@@ -372,7 +372,7 @@
             afterMap.addLayer({
                 id: 'redlining_seattle_fill',
                 type: 'fill',
-                source: 'redlining_seattle',
+                source: 'merged_seattle_redlining',
                 paint: {
                     'fill-color': '#000000',
                     'fill-opacity': 0 
