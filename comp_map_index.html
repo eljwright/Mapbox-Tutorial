@@ -449,8 +449,10 @@
     
         // Comp Full Map - COMPARE FUNCTION
         const map = new mapboxgl.Compare(beforeMap, afterMap, '#comparison-container', {
-            mousemove: false // Enable for mousemove comparison, but it can be a bit much
+            mousemove: false, // Enable for mousemove comparison, but it can be a bit much
         });
+
+        compare.setSlider(500);
 
     //Geolocater - try to fix so its on the comp map and not have to be on both before and after maps
     beforeMap.addControl(
